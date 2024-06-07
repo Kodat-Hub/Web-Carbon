@@ -168,6 +168,8 @@ function makeBond(sourceX, sourceY, destinationX, destinationY, numOfBonds) {
     setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds)
 }
 
+// TO-DO: open-ia, getCompoundName()
+
 //Logic
 // getGridElements
 
