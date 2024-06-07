@@ -1,0 +1,30 @@
+// $mainDark: #302B27;
+// $mainLight: #F1F7ED;
+
+// $mainTheme: #907AD6;
+// $mainThemeAlternative: #EA8C55;
+// $mainContrast: #ED474A;
+
+// $background: $mainDark;
+
+$light: #F1EDEE;
+$middle: #59656F;
+$dark: #1D1E2C;
+
+$primary: #FE5F55;
+$secondary: #52B788;
+$tertiary: #B80C09;
+
+$background: $light;
+
+:export {
+    light: $light;
+    middle: $middle;
+    dark: $dark;
+
+    primary: $primary;
+    secondary: $secondary;
+    tertiary: $tertiary;
+
+    background: $background;
+}

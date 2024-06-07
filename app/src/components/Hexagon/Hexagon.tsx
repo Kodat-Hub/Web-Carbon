@@ -1,17 +1,20 @@
 import React from 'react'
 import styled from 'styled-components'
+import palette from 'src/styles/palette.module.scss'
 
 export default function Hexagon({
-    width = '160px',
-    backgroundColor = 'white',
-    borderWidth = '5px',
-    borderColor = 'red',
+    width = '80px',
+    borderWidth = '4px',
+    backgroundColor = palette.background,
+    borderColor = palette.dark,
+    color = palette.dark,
     text = 'C',
 } : {
     width?: string
-    backgroundColor?: string
     borderWidth?: string
+    backgroundColor?: string
     borderColor?: string
+    color?: string
     text?: string
 }) {
 
@@ -66,6 +69,7 @@ export default function Hexagon({
         top: 50%;
         left: 50%;
         transform: translateX(-50%) translateY(-50%);
+        color: ${color};
     `;
 
     return (
