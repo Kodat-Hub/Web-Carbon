@@ -1,3 +1,5 @@
+/**GLOBALDATA**/
+
 //Constants
 const EMPTY_CELL = '.';
 const PLACEHOLDER_CELL = '*';
@@ -10,6 +12,8 @@ let grid = undefined;
 let xGlobalOffset = 0;
 let yGlobalOffset = 0;
 let selectedElementCell = undefined;
+
+/***CODE***/
 
 //Fundatamental blocks
 function getCell(x, y) {
@@ -168,10 +172,79 @@ function makeBond(sourceX, sourceY, destinationX, destinationY, numOfBonds) {
     setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds)
 }
 
-// TO-DO: open-ia, getCompoundName()
+function getCompoundNameWithRequest(textualCompound) {
+    //General API
+    const baseURL = "https://openrouter.ai/api/v1/";
+    const token = "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";
+    
+    //chat/completions
+    const endPoint = "chat/completions";
+    const model = "openai/gpt-3.5-turbo";
+    // citar iupac
+    const persona = "Give just the name of hydrocarbons.\n\tCarbon is 'C', number is quantity of bonds is number and '0' are empty space.\n\tJust send its name.\n\tExample of 'Ethane': \n0000000\n0000000\n00C1C00\n0000000\n0000000";
+    const temperature = 0;
+
+    //Request
+    const body = {
+        model: model,
+        messages: [
+            {
+                role: "system",
+                content: persona
+            },
+            {
+                "role": "user",
+                "content": textualCompound
+            }
+        ],
+        temperature: temperature,
+        logprobs: false
+    }
+    const responsePromise = fetch(`${baseURL}${endPoint}`, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(body)
+    });
+
+    return responsePromise;
+}
+
+async function getCompoundName() {
+    const textualCompound = getTextualCompound();
+
+    const numOfExemplaries = 10;
+
+    const exemplariesNamesPromises = Array.from({ length: numOfExemplaries }, 
+        async () => {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            return getCompoundNameWithRequest(textualCompound);
+        }
+    );
+
+    const responses = await Promise.all(exemplariesNamesPromises);
+    const responsesBody = await Promise.all(responses.map(response => response.json()));
+
+    const exemplariesNames = responsesBody
+                                    .map(data => data.choices[0].message.content);
+
+    const name = getMoreOccurrenceName(exemplariesNames);
+
+    return name;
+}
+
+function getMoreOccurrenceName(exemplariesNames) {
+    const frequencyCounter = exemplariesNames.reduce((counter, name) => {
+        counter[name] = (counter[name] || 0) + 1;
+        return counter;
+    }, {});
+
+    return Object.keys(frequencyCounter).reduce((a, b) => frequencyCounter[a] > frequencyCounter[b] ? a : b);
+}
 
 //Logic
-// getGridElements
 
 function expandGrid(destinationX, destinationY) {
     const newSize = getNewSizes(destinationX, destinationY);
@@ -273,6 +346,26 @@ function promptGrid() {
     transposedGrid.forEach(row => console.log(row.join(' ')));
 }
 
+function getTextualCompound() {
+    const transposedGrid = grid[0].map((_, colIndex) => grid.map(row => row[colIndex]));
+    const result = [];
+    for (let i = 0; i < transposedGrid.length; i++) {
+        const row = transposedGrid[i];
+        let rowString = "";
+        for (let j = 0; j < row.length; j++) {
+            if (transposedGrid[i][j] === "." || transposedGrid[i][j] === "*") {
+                rowString += "0";
+            } else if (transposedGrid[i][j] === " ") {
+                rowString += "\t";
+            } else {
+                rowString += transposedGrid[i][j];
+            }
+        }
+        result.push(rowString);
+    }
+    return result.join("\n");
+}
+
 function init() {
     grid = [[
         PLACEHOLDER_CELL
@@ -283,17 +376,176 @@ function init() {
     selectedElementCell = undefined;
 }
 
-let testCount = 0;
+test();
 
-// Test
-testCount++
-console.log(`Test ${testCount}:`);
-init();
-addElementCell('C');
-addElementCell('C', -1, 0, 0, 0);
-selectElementCell(0, 0);
-addElementCell('C', 1, 0, 0, 0);
-selectElementCell(0, 0);
-addElementCell('C', 1, -1, 0, 0);
-addElementCell('C', 0, -1, 1, -1);
-promptGrid();
+/***TEST***/
+async function test() {
+    let testCount = 0;
+    let numOfSuccess = 0;
+
+    // Test
+    init();
+    addElementCell('C');
+    (await testCompound(++testCount, "Methane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    (await testCompound(++testCount, "Ethane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 1, 0, 0);
+    (await testCompound(++testCount, "Ethane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', -1, -1, 0, 0);
+    (await testCompound(++testCount, "Ethane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    (await testCompound(++testCount, "Propane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 1, 1, 0);
+    (await testCompound(++testCount, "Propane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, -1, 1, 0);
+    (await testCompound(++testCount, "Propane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    addElementCell('C', 3, 0, 2, 0);
+    (await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 1, 0, 0);
+    addElementCell('C', 2, 0, 1, 1);
+    addElementCell('C', 1, -1, 2, 0);
+    (await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    addElementCell('C', 3, 0, 2, 0);
+    addElementCell('C', 4, 0, 3, 0);
+    addElementCell('C', 5, 0, 4, 0);
+    (await testCompound(++testCount, "Hexane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    addElementCell('C', 3, 0, 2, 0);
+    addElementCell('C', 4, 0, 3, 0);
+    (await testCompound(++testCount, "Pentane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, -1, 0, 0);
+    makeBond(1, -1, 0, 0, 2);
+    addElementCell('C', 2, -1, 1, -1);
+    addElementCell('C', 3, 0, 2, -1);
+    makeBond(3, 0, 2, -1, 2);
+    addElementCell('C', 2, 1, 3, 0);
+    addElementCell('C', 1, 1, 2, 1);
+    makeBond(1, 1, 2, 1, 2);
+    makeBond(1, 1, 0, 0, 1);
+    (await testCompound(++testCount, "Benzene")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    addElementCell('C', 3, 0, 2, 0);
+    addElementCell('C', 4, 1, 3, 0);
+    addElementCell('C', 5, 2, 4, 1);
+    selectElementCell(3, 0);
+    addElementCell('C', 4, 0, 3, 0);
+    selectElementCell(1, 0);
+    addElementCell('C', 2, 1, 1, 0);
+    (await testCompound(++testCount, "2,4-dimethylhexane")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    makeBond(2, 0, 1, 0, 2);
+    addElementCell('C', 3, 0, 2, 0);
+    (await testCompound(++testCount, "but-2-ene")) ? numOfSuccess+=1 : '';
+
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    makeBond(1, 0, 0, 0, 2);
+    addElementCell('C', 2, 0, 1, 0);
+    addElementCell('C', 3, 0, 2, 0);
+    (await testCompound(++testCount, "but-1-ene")) ? numOfSuccess+=1 : '';
+    
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, -1, 1, 0);
+    selectElementCell(1, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    makeBond(2, 0, 1, 0, 2);
+    addElementCell('C', 3, 0, 2, 0);
+    addElementCell('C', 4, 0, 3, 0);
+    addElementCell('C', 5, 0, 4, 0);
+    selectElementCell(3, 0);
+    addElementCell('C', 4, 1, 3, 0);
+    addElementCell('C', 5, 2, 4, 1);
+    (await testCompound(++testCount, "4-ethyl-2-methylhex-2-ene")) ? numOfSuccess+=1 : '';
+
+    console.log("End of tests");
+    console.log("Number of tests: " + testCount);
+    console.log("Number of success: " + numOfSuccess);
+
+
+}
+
+async function testCompound(testCount, expectedName) {
+    console.log(`Test ${testCount}:`);
+
+    console.log("Compound:");
+    promptGrid();
+
+    console.log("Calculating name...");
+    return (await getCompoundName().then(name => {
+        console.log("AI Generated Name: " + name);
+
+        console.log("Expected Name: " + expectedName);
+        const status = name.trim().toLowerCase().localeCompare(expectedName.trim().toLowerCase()) == 0  ? 'Success!' : 'Failure';
+        console.log("Status: " + status);
+        console.log("\n");
+
+        return name.trim().toLowerCase().localeCompare(expectedName.trim().toLowerCase()) == 0;
+    }));
+}
