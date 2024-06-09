@@ -58,24 +58,11 @@ export default function Bond({
             numOfBonds++
         }
 
-        //Get the bonded element index
-        const elementA = {x: 0, y: 0};
-        const elementB = {x: 0, y: 0};
-        if (yIndex % 2 === 0) {
-            Object.assign(elementA, { x: xIndex - 1, y: yIndex });
-            Object.assign(elementB, { x: xIndex + 1, y: yIndex });
-        } else {
-            Object.assign(elementA, { x: xIndex - 1, y: yIndex - 1 });
-            Object.assign(elementB, { x: xIndex + 1, y: yIndex + 1 });
-        }
-
         const newGrid = makeBond(
             getTransposedGrid(dataGrid), 
-            elementA.x, 
-            elementA.y, 
-
-            elementB.x, 
-            elementB.y, 
+            xIndex, 
+            yIndex, 
+ 
             numOfBonds
         );
 

@@ -31,6 +31,8 @@ export default function Hexagon({
     const [yIndex, xIndex] = id.split('.').map(Number);
     const transposedGrid = getTransposedGrid(dataGrid);
 
+    console.log(xIndex, yIndex)
+
     const newGrid = text === '+'
       ? addElementCell(transposedGrid, 'C', xIndex, yIndex)
       : selectElementCell(transposedGrid, xIndex, yIndex);

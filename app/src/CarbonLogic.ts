@@ -123,7 +123,7 @@ function setSelectedElementCell(x: number, y: number): void {
 }
 
 // Actions
-export function addElementCell(dataGrid: string[][], acronym: string, destinationX = 0, destinationY = 0, sourceX?: number, sourceY?: number): string[][] {
+export function addElementCell(dataGrid: string[][], acronym: string, destinationX = 0, destinationY = 0): string[][] {
     setGrid(dataGrid);
     
     expandGrid(destinationX, destinationY);
@@ -149,7 +149,7 @@ export function addElementCell(dataGrid: string[][], acronym: string, destinatio
             throw new Error('Max number of bonds in source element.');
         }
 
-        makeBond(grid, sourceX, sourceY, destinationX, destinationY, 1);
+        makeBond(grid, sourceX, sourceY, 1, destinationX, destinationY);
     }
 
     selectElementCell(grid, destinationX, destinationY);
@@ -207,35 +207,68 @@ export function deselectElementCell(dataGrid: string[][]): string[][] {
     return getTransposedGrid(grid);
 }
 
-export function makeBond(dataGrid: string[][], sourceX: number, sourceY: number, destinationX: number, destinationY: number, numOfBonds: number): string[][] {
+export function makeBond(dataGrid: string[][], sourceX: number, sourceY: number, numOfBonds: number, destinationX?: number, destinationY?: number): string[][] {
     setGrid(dataGrid);
-    if(sourceX < destinationX && sourceY < destinationY && Number(getCell(sourceX+1, sourceY+1)) !== 0) {
-        const bondReversedSignal = Number(getCell(sourceX+1, sourceY+1)) < 0 ? 1 : -1;
 
-        setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds * bondReversedSignal);
-    }
-    else {
-        const sourceCell = getElement(sourceX, sourceY);
+    // Bond index in sourceX and sourceY, get elements index
+    if(typeof destinationX === 'undefined' && typeof destinationY === 'undefined') {
+        if(sourceY % 2 === 0) {
+            destinationX = sourceX + 1;
+            destinationY = sourceY;
 
-        if(numOfBonds === 1){
-            setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds);
+            sourceX = sourceX - 1;
+            sourceY = sourceY;
         } else {
-            const sourceElementDescriptor = getElementDescriptorByAcronym(sourceCell);
-            const sourceElementBonds = getNumOfBonds(sourceX, sourceY);
-            if (sourceElementBonds >= sourceElementDescriptor.maxBonds) {
-                throw new Error('Not sufficient number of available bonds in elements.');
+            const bond = Number(getCell(sourceX, sourceY));
+
+            if(bond>0) {
+                destinationX = sourceX + 1;
+                destinationY = sourceY - 1;
+
+                sourceX = sourceX - 1;
+                sourceY = sourceY + 1;
+            } else if(bond<0) {
+                destinationX = sourceX - 1;
+                destinationY = sourceY - 1;
+
+                sourceX = sourceX + 1;
+                sourceY = sourceY + 1;
+            } else {
+                const topRightCell = getCell(sourceX + 1, sourceY - 1);
+                if(isElement(topRightCell)) {
+                    destinationX = sourceX + 1;
+                    destinationY = sourceY - 1;
+
+                    sourceX = sourceX - 1;
+                    sourceY = sourceY + 1;
+                } else {
+                    destinationX = sourceX - 1;
+                    destinationY = sourceY - 1;
+
+                    sourceX = sourceX + 1;
+                    sourceY = sourceY + 1;
+                }
             }
-
-            const destinationCellCell = getElement(destinationX, destinationY);
-
-            const destinationElementDescriptor = getElementDescriptorByAcronym(destinationCellCell);
-            const destinationElementBonds = getNumOfBonds(destinationX, destinationY);
-            if (destinationElementBonds >= destinationElementDescriptor.maxBonds) {
-                throw new Error('Not sufficient number of available bonds in elements.');
-            }
-
-            setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds);
         }
+    }
+    destinationX = destinationX as number;
+    destinationY = destinationY as number;
+
+    setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds);
+
+    const sourceCell = getElement(sourceX, sourceY);
+    const sourceElementDescriptor = getElementDescriptorByAcronym(sourceCell);
+    const sourceElementBonds = getNumOfBonds(sourceX, sourceY);
+
+    const destinationCellCell = getElement(destinationX, destinationY);
+    const destinationElementDescriptor = getElementDescriptorByAcronym(destinationCellCell);
+    const destinationElementBonds = getNumOfBonds(destinationX, destinationY);
+
+    if(
+        sourceElementBonds > sourceElementDescriptor.maxBonds || 
+        destinationElementBonds > destinationElementDescriptor.maxBonds
+    ) {
+        setBond(sourceX, sourceY, destinationX, destinationY, 1);
     }
 
     return getTransposedGrid(grid);
@@ -400,7 +433,7 @@ function makeNullBonds(x: number, y: number): void {
     bonds.forEach(bond => {
         const numOfBonds = Number(bond.numOfBonds);
         if (isNaN(numOfBonds)) {
-            makeBond(grid, x, y, bond.x, bond.y, 0);
+            makeBond(grid, x, y, 0, bond.x, bond.y);
         }
     });
 }
