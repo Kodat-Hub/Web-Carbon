@@ -2,6 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import palette from 'src/styles/Palette.module.scss'
 
+import { addElementCell, selectElementCell, makeBond, getCompoundName, getTransposedGrid } from './../../CarbonLogic.ts'
+
 export default function Hexagon({
     width = '80px',
     borderWidth = '4px',
@@ -9,6 +11,9 @@ export default function Hexagon({
     borderColor = palette.light,
     color = palette.light,
     text = '',
+    id,
+    dataGrid,
+    setDataGrid
 } : {
     width?: string
     borderWidth?: string
@@ -16,7 +21,23 @@ export default function Hexagon({
     borderColor?: string
     color?: string
     text?: string | JSX.Element
+    id: string
+    dataGrid: string[][]
+    setDataGrid: React.Dispatch<React.SetStateAction<string[][]>>
 }) {
+
+    const handleClick = () => {
+        const [ yIndex, xIndex ] = id.split('.');
+
+        let newGrid = undefined;
+        if(text === '+') {
+            newGrid = addElementCell(getTransposedGrid(dataGrid), 'C', Number(xIndex), Number(yIndex));
+        } else {
+            newGrid = selectElementCell(getTransposedGrid(dataGrid), Number(xIndex), Number(yIndex));
+        }
+
+        setDataGrid(newGrid);
+    }
 
     // 0.5774: This is a constant that shows the height-to-width ratio of a hexagon, based on the formula sqrt(3)/2.
     // 0.2887: This is a constant that indicates a positional offset representing a sixth of the hexagon side, helping to position the vertices accurately.
@@ -51,6 +72,7 @@ export default function Hexagon({
 
     const HexagonWrapper = styled.div`
         display: inline-block;
+        cursor: pointer;
         padding: ${borderWidth};
         background-color: ${borderColor};
         clip-path: polygon(
@@ -79,7 +101,7 @@ export default function Hexagon({
     `;
 
     return (
-        <HexagonWrapper>
+        <HexagonWrapper onClick={handleClick}>
             <HexagonComponent>
                 <Text> {text} </Text>
             </HexagonComponent>
