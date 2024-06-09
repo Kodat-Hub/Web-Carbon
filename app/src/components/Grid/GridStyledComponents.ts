@@ -22,7 +22,7 @@ export const GridComponent = styled.div<GridProps>`
     display: grid;
     align-items: center;
     grid-template-columns: repeat(${props => props.length}, auto);
-
+    padding: 48px;
 
     ${EmptyCell} { transform: translateX(0); }
 

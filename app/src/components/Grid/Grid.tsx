@@ -3,6 +3,7 @@ import Hexagon from '../Hexagon/Hexagon';
 import styles from './Grid.module.scss'
 import { GridComponent, GridCell, EmptyCell } from './GridStyledComponents';
 import Bond from '../Bond/Bond';
+import palette from 'src/styles/Palette.module.scss';
 
 export default function Grid ({ 
     data 
@@ -14,10 +15,9 @@ export default function Grid ({
         <GridComponent length={data[0].length}>
             {data.map((row, rowIndex) => {
                 const offset = (rowIndex % 4 != 2);
-                const reverseRotateLine = (rowIndex % 4 == 1);
                 return (
                     row.map((cell, colIndex) => {
-                        const isBond = [-3, -2, -1, 1, 2, 3].includes(parseInt(cell));
+                        const isBond = [-3, -2, -1, 0, 1, 2, 3].includes(parseInt(cell));
                         const reverseRotateBond = isBond && parseInt(cell) < 0;
                         return (
                             <GridCell
@@ -27,12 +27,22 @@ export default function Grid ({
                                     ${offset ? 'offset' : ''}
                                     ${isBond ? 'bond' : ''}
                                     ${reverseRotateBond ? 'reverse' : ''}
-                                    ${reverseRotateLine ? 'reverse-rotate-line' : ''}
                                 `}
                             >
-                                {cell === 'C' && <Hexagon text='C' />}
-                                {isBond && <Bond type={Math.abs((parseInt(cell)))}/>}
-                                {['.', '*'].includes(cell) && <EmptyCell />}
+                                {
+                                    // Bond
+                                    isBond && <Bond type={Math.abs((parseInt(cell)))}/>
+
+                                    // Empty space
+                                    ||  ['', ' ', '.'].includes(cell) && <EmptyCell />
+
+                                    // Placeholder
+                                    || cell === '*' && <Hexagon text='+' backgroundColor={palette.background} borderColor={palette.secondary} color={palette.secondary}/>
+
+                                    // Element
+                                    || <Hexagon text={cell} />
+                                }
+                                
                             </GridCell>
                     )})
                 );

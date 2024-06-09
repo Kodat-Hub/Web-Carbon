@@ -8,14 +8,14 @@ export default function Hexagon({
     backgroundColor = palette.background,
     borderColor = palette.light,
     color = palette.light,
-    text = 'C',
+    text = '',
 } : {
     width?: string
     borderWidth?: string
     backgroundColor?: string
     borderColor?: string
     color?: string
-    text?: string
+    text?: string | JSX.Element
 }) {
 
     // 0.5774: This is a constant that shows the height-to-width ratio of a hexagon, based on the formula sqrt(3)/2.
@@ -64,12 +64,17 @@ export default function Hexagon({
     `;
 
     const Text = styled.div`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono&display=swap');
         color: black;
+        
+        font-family: "DM Mono", monospace;
         font-size: calc(0.5 * ${width});
+
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translateX(-50%) translateY(-50%);
+
         color: ${color};
     `;
 
