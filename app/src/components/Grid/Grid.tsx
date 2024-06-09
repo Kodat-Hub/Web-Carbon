@@ -36,6 +36,12 @@ export default function Grid () {
 
     return (
         <>
+            <button onClick={async () => console.log(await getCompoundName(getTransposedGrid(dataGrid)))}>
+                nominate
+            </button>
+            <button onClick={() => setDataGrid(deselectElementCell(getTransposedGrid(dataGrid)))}>
+                deselect
+            </button>
             <CompoundName>
                 <h1>{compoundName}</h1>
                 <button>GENERATE</button>

@@ -28,7 +28,6 @@ export default function Hexagon({
 
     const handleClick = () => {
         const [ yIndex, xIndex ] = id.split('.');
-        console.log(xIndex, yIndex)
 
         let newGrid = undefined;
         if(text === '+') {
