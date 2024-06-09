@@ -34,8 +34,8 @@ export const GridComponent = styled.div<GridProps>`
     
     // .offset { transform: translateX(88px); }
 
-    .odd.bond         { transform: rotate(-45deg); }
-    .odd.bond.reverse { transform: rotate( 45deg); }
+    .odd.bond         { transform: rotate(-30deg); }
+    .odd.bond.reverse { transform: rotate( 30deg); }
 
     .no-display: {
         display: none;
