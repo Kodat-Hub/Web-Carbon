@@ -69,15 +69,7 @@ export default function Grid () {
         <>
             <CompoundName>
                 <h1>{compoundName}</h1>
-                <button>GENERATE</button>
-                <div>
-                    <button onClick={async () => console.log(await getCompoundName(dataGridTransposed))}>
-                        nominate
-                    </button>
-                    <button onClick={() => setDataGrid(deselectElementCell(dataGridTransposed))}>
-                        deselect
-                    </button>
-                </div>
+                <button onClick={async () => setCompoundName(await getCompoundName(dataGridTransposed))}>NOMINATE</button>
             </CompoundName>
 
             <CompoundContainer>
@@ -90,6 +82,7 @@ export default function Grid () {
                                 const isBond = [-3, -2, -1, 0, 1, 2, 3].includes(parseInt(cell));
                                 const isEmpty = ['', ' ', '.'].includes(cell);
                                 const reverseRotateBond = isBond && parseInt(cell) < 0;
+                                const noRotateBond = isBond && parseInt(cell) === 0;
                                 return (
                                     <GridCell
                                         key={colIndex}
@@ -98,6 +91,7 @@ export default function Grid () {
                                             ${offset ? 'offset' : ''}
                                             ${isBond ? 'bond' : ''}
                                             ${reverseRotateBond ? 'reverse' : ''}
+                                            ${noRotateBond ? 'no-rotate' : ''}
                                         `}
                                         onClick={isEmpty ? () => setDataGrid(deselectElementCell(dataGridTransposed)) : () => {return}}
                                     >
