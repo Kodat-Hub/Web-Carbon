@@ -63,7 +63,7 @@ export default function Grid () {
 
     useEffect(() => {
         setDataGridTransposed(getTransposedGrid(dataGrid))
-    })
+    }, [dataGrid])
 
     return (
         <>
@@ -88,6 +88,7 @@ export default function Grid () {
                             
                             row.map((cell, colIndex) => {
                                 const isBond = [-3, -2, -1, 0, 1, 2, 3].includes(parseInt(cell));
+                                const isEmpty = ['', ' ', '.'].includes(cell);
                                 const reverseRotateBond = isBond && parseInt(cell) < 0;
                                 return (
                                     <GridCell
@@ -98,13 +99,14 @@ export default function Grid () {
                                             ${isBond ? 'bond' : ''}
                                             ${reverseRotateBond ? 'reverse' : ''}
                                         `}
+                                        onClick={isEmpty ? () => setDataGrid(deselectElementCell(dataGridTransposed)) : () => {return}}
                                     >
                                         {
                                             // Bond
                                             isBond && <Bond id={`${rowIndex}.${colIndex}`} type={Math.abs((parseInt(cell)))} dataGrid={dataGrid} setDataGrid={setDataGrid}/>
 
                                             // Empty space
-                                            ||  ['', ' ', '.'].includes(cell) && <EmptyCell />
+                                            || isEmpty && <EmptyCell />
 
                                             // Placeholder
                                             || cell === '*' && <Hexagon id={`${rowIndex}.${colIndex}`} text='+' dataGrid={dataGrid} setDataGrid={setDataGrid} backgroundColor={palette.background} borderColor={palette.secondary} color={palette.secondary}/>
