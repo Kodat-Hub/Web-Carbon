@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Hexagon from '../Hexagon/Hexagon';
 import { GridComponent, GridCell, EmptyCell } from './GridStyledComponents';
 import Bond from '../Bond/Bond';
@@ -8,15 +8,21 @@ import { addElementCell, removeElementCell, selectElementCell, deselectElementCe
 import styled from 'styled-components';
 
 const CompoundName = styled.div`
+    width: 100vw;
+    height: 15vh;
+
     display: flex;
     flex-direction: column;
+
+    align-content: center;
     
-    position: fixed;
+    position: relative;
     top: 16px;
 
     h1 {
         font-size: 32px;
         text-transform: lowercase;
+        text-align: center;
     }
 
     button {
@@ -26,64 +32,93 @@ const CompoundName = styled.div`
         border-radius: 5px;
         padding: 5px 8px;
         margin: 0 auto;
+
+        &:hover {
+            cursor: pointer;
+        }
     }
+`
+
+const CompoundContainer = styled.div`
+    display: flex;
+
+    width: calc(100vw - 48px);
+    min-height: 80vh;
+    height: fit-content;
+
+    position: absolute;
+    left: 0;
+    top: 20vh;
+
+    justify-content: center;
+    align-items: center;
+    overflow: scroll;
 `
 
 export default function Grid () {
 
     const [ compoundName, setCompoundName ] = useState('create your element');
     const [ dataGrid, setDataGrid ] = useState([[ '*' ]]);
+    const [ dataGridTransposed, setDataGridTransposed ] = useState([[ '*' ]]);
+
+    useEffect(() => {
+        setDataGridTransposed(getTransposedGrid(dataGrid))
+    })
 
     return (
         <>
-            <button onClick={async () => console.log(await getCompoundName(getTransposedGrid(dataGrid)))}>
-                nominate
-            </button>
-            <button onClick={() => setDataGrid(deselectElementCell(getTransposedGrid(dataGrid)))}>
-                deselect
-            </button>
             <CompoundName>
                 <h1>{compoundName}</h1>
                 <button>GENERATE</button>
+                <div>
+                    <button onClick={async () => console.log(await getCompoundName(dataGridTransposed))}>
+                        nominate
+                    </button>
+                    <button onClick={() => setDataGrid(deselectElementCell(dataGridTransposed))}>
+                        deselect
+                    </button>
+                </div>
             </CompoundName>
 
-            <GridComponent length={dataGrid[0].length}>
-                {dataGrid.map((row, rowIndex) => {
-                    const offset = (rowIndex % 4 != 2);
-                    return (
-                        
-                        row.map((cell, colIndex) => {
-                            const isBond = [-3, -2, -1, 0, 1, 2, 3].includes(parseInt(cell));
-                            const reverseRotateBond = isBond && parseInt(cell) < 0;
-                            return (
-                                <GridCell
-                                    key={colIndex}
-                                    className={`
-                                        ${rowIndex % 2 === 0 ? 'even' : 'odd'}
-                                        ${offset ? 'offset' : ''}
-                                        ${isBond ? 'bond' : ''}
-                                        ${reverseRotateBond ? 'reverse' : ''}
-                                    `}
-                                >
-                                    {
-                                        // Bond
-                                        isBond && <Bond id={`${rowIndex}.${colIndex}`} type={Math.abs((parseInt(cell)))} dataGrid={dataGrid} setDataGrid={setDataGrid}/>
+            <CompoundContainer>
+                <GridComponent length={dataGrid[0].length}>
+                    {dataGrid.map((row, rowIndex) => {
+                        const offset = (rowIndex % 4 != 2);
+                        return (
+                            
+                            row.map((cell, colIndex) => {
+                                const isBond = [-3, -2, -1, 0, 1, 2, 3].includes(parseInt(cell));
+                                const reverseRotateBond = isBond && parseInt(cell) < 0;
+                                return (
+                                    <GridCell
+                                        key={colIndex}
+                                        className={`
+                                            ${rowIndex % 2 === 0 ? 'even' : 'odd'}
+                                            ${offset ? 'offset' : ''}
+                                            ${isBond ? 'bond' : ''}
+                                            ${reverseRotateBond ? 'reverse' : ''}
+                                        `}
+                                    >
+                                        {
+                                            // Bond
+                                            isBond && <Bond id={`${rowIndex}.${colIndex}`} type={Math.abs((parseInt(cell)))} dataGrid={dataGrid} setDataGrid={setDataGrid}/>
 
-                                        // Empty space
-                                        ||  ['', ' ', '.'].includes(cell) && <EmptyCell />
+                                            // Empty space
+                                            ||  ['', ' ', '.'].includes(cell) && <EmptyCell />
 
-                                        // Placeholder
-                                        || cell === '*' && <Hexagon id={`${rowIndex}.${colIndex}`} text='+' dataGrid={dataGrid} setDataGrid={setDataGrid} backgroundColor={palette.background} borderColor={palette.secondary} color={palette.secondary}/>
+                                            // Placeholder
+                                            || cell === '*' && <Hexagon id={`${rowIndex}.${colIndex}`} text='+' dataGrid={dataGrid} setDataGrid={setDataGrid} backgroundColor={palette.background} borderColor={palette.secondary} color={palette.secondary}/>
 
-                                        // Element
-                                        || <Hexagon id={`${rowIndex}.${colIndex}`} text={cell} dataGrid={dataGrid} setDataGrid={setDataGrid} />
-                                    }
-                                    
-                                </GridCell>
-                        )})
-                    );
-                })}
-            </GridComponent>
+                                            // Element
+                                            || <Hexagon id={`${rowIndex}.${colIndex}`} text={cell} dataGrid={dataGrid} setDataGrid={setDataGrid} />
+                                        }
+                                        
+                                    </GridCell>
+                            )})
+                        );
+                    })}
+                </GridComponent>
+            </CompoundContainer>
         </>
     );
 };
