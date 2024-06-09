@@ -90,7 +90,17 @@ function setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds) {
     const bondX = (sourceX*2 + destinationX*2) / 2;
     const bondY = (sourceY*2 + destinationY*2) / 2;
 
-    setCell(bondX, bondY, numOfBonds);
+    if(isNaN(Number(numOfBonds))) {
+        setCell(bondX, bondY, numOfBonds);
+    }
+    
+    const direction = sourceY == destinationY 
+    || (destinationX > sourceX && destinationY < sourceY) 
+    ||(destinationY > sourceY && destinationX < sourceX) 
+        ? 1 
+        : -1;
+
+    setCell(bondX, bondY, numOfBonds*direction);
 }
 
 function removeBond(sourceX, sourceY, destinationX, destinationY) {
@@ -189,7 +199,7 @@ function makeBond(sourceX, sourceY, destinationX, destinationY, numOfBonds) {
         throw new Error('Not sufficient number of available bonds in destination element.');
     }
     
-    setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds)
+    setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds);
 }
 
 function getCompoundNameWithRequest(textualCompound) {
@@ -353,7 +363,7 @@ function getBondsAndNearElements(x, y) {
 
 function getNumOfBonds(x, y) {
     const bonds = getBondsAndNearElements(x, y);
-    const totalNumOfBonds = bonds.reduce((sum, bond) => sum + bond.numOfBonds, 0);
+    const totalNumOfBonds = bonds.reduce((sum, bond) => sum + Math.abs(bond.numOfBonds), 0);
 
     return totalNumOfBonds;
 }
@@ -372,7 +382,10 @@ function getTextualCompound() {
         for (let j = 0; j < row.length; j++) {
             if (transposedGrid[i][j] == "." || transposedGrid[i][j] == "*" || transposedGrid[i][j] == 0) {
                 rowString += ".";
-            } else if (transposedGrid[i][j] === " ") {
+            } else if (transposedGrid[i][j] < 0) {
+                transposedGrid[i][j] = -transposedGrid[i][j];
+            }
+            else if (transposedGrid[i][j] === " ") {
                 rowString += "\t";
             } else {
                 rowString += transposedGrid[i][j];
@@ -400,89 +413,97 @@ async function test() {
     let testCount = 0;
     let numOfSuccess = 0;
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, 1, 0, 0);
-    // addElementCell('C', 2, 2, 1, 1);
-    // addElementCell('C', 3, 3, 2, 2);
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 1, 0, 0);
+    addElementCell('C', 2, 2, 1, 1);
+    addElementCell('C', 3, 3, 2, 2);
     // (await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+    promptGrid();
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, 0, 0, 0);
-    // addElementCell('C', 2, 0, 1, 0);
-    // (await testCompound(++testCount, "Propane")) ? numOfSuccess+=1 : '';
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    //(await testCompound(++testCount, "Propane")) ? numOfSuccess+=1 : '';
+    promptGrid();
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, 0, 0, 0);
-    // addElementCell('C', 2, 1, 1, 0);
-    // (await testCompound(++testCount, "Propane")) ? numOfSuccess+=1 : '';
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 1, 1, 0);
+    //(await testCompound(++testCount, "Propane")) ? numOfSuccess+=1 : '';
+    promptGrid();
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, 1, 0, 0);
-    // addElementCell('C', 2, 0, 1, 1);
-    // addElementCell('C', 1, -1, 2, 0);
-    // (await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 1, 0, 0);
+    addElementCell('C', 2, 0, 1, 1);
+    addElementCell('C', 1, -1, 2, 0);
+    //(await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+    promptGrid();
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, -1, 0, 0);
-    // makeBond(1, -1, 0, 0, 2);
-    // addElementCell('C', 2, -1, 1, -1);
-    // addElementCell('C', 3, 0, 2, -1);
-    // makeBond(3, 0, 2, -1, 2);
-    // addElementCell('C', 2, 1, 3, 0);
-    // addElementCell('C', 1, 1, 2, 1);
-    // makeBond(1, 1, 2, 1, 2);
-    // makeBond(1, 1, 0, 0, 1);
-    // (await testCompound(++testCount, "Benzene")) ? numOfSuccess+=1 : '';
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, -1, 0, 0);
+    makeBond(1, -1, 0, 0, 2);
+    addElementCell('C', 2, -1, 1, -1);
+    addElementCell('C', 3, 0, 2, -1);
+    makeBond(3, 0, 2, -1, 2);
+    addElementCell('C', 2, 1, 3, 0);
+    addElementCell('C', 1, 1, 2, 1);
+    makeBond(1, 1, 2, 1, 2);
+    makeBond(1, 1, 0, 0, 1);
+    //(await testCompound(++testCount, "Benzene")) ? numOfSuccess+=1 : '';
+    promptGrid();
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, 0, 0, 0);
-    // addElementCell('C', 2, 0, 1, 0);
-    // makeBond(2, 0, 1, 0, 2);
-    // addElementCell('C', 3, 0, 2, 0);
-    // (await testCompound(++testCount, "but-2-ene")) ? numOfSuccess+=1 : '';
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, 0, 0, 0);
+    addElementCell('C', 2, 0, 1, 0);
+    makeBond(2, 0, 1, 0, 2);
+    addElementCell('C', 3, 0, 2, 0);
+    //(await testCompound(++testCount, "but-2-ene")) ? numOfSuccess+=1 : '';
+    promptGrid();
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, -1, 0, 0);
-    // addElementCell('C', 2, -1, 1, -1);
-    // makeBond(2, -1, 1, -1, 2);
-    // addElementCell('C', 3, 0, 2, -1);
-    // addElementCell('C', 2, 1, 3, 0);
-    // makeBond(2, 1, 3, 0, 2);
-    // addElementCell('C', 1, 1, 2, 1);
-    // makeBond(1, 1, 0, 0, 2);
-    // (await testCompound(++testCount, "Benzene")) ? numOfSuccess+=1 : '';
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, -1, 0, 0);
+    addElementCell('C', 2, -1, 1, -1);
+    makeBond(2, -1, 1, -1, 2);
+    addElementCell('C', 3, 0, 2, -1);
+    addElementCell('C', 2, 1, 3, 0);
+    makeBond(2, 1, 3, 0, 2);
+    addElementCell('C', 1, 1, 2, 1);
+    makeBond(1, 1, 0, 0, 2);
+    //(await testCompound(++testCount, "Benzene")) ? numOfSuccess+=1 : '';
+    promptGrid();
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, -1, 0, 0);
-    // addElementCell('C', 2, -1, 1, -1);
-    // addElementCell('C', 3, 0, 2, -1);
-    // (await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, -1, 0, 0);
+    addElementCell('C', 2, -1, 1, -1);
+    addElementCell('C', 3, 0, 2, -1);
+    //(await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+    promptGrid();
 
-    // // Test
-    // init();
-    // addElementCell('C');
-    // addElementCell('C', 1, -1, 0, 0);
-    // addElementCell('C', 2, -1, 1, -1);
-    // addElementCell('C', 1, -2, 2, -1);
-    // (await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+    // Test
+    init();
+    addElementCell('C');
+    addElementCell('C', 1, -1, 0, 0);
+    addElementCell('C', 2, -1, 1, -1);
+    addElementCell('C', 1, -2, 2, -1);
+    //(await testCompound(++testCount, "Butane")) ? numOfSuccess+=1 : '';
+    promptGrid();
     
-
     console.log("End of tests");
     console.log("Number of tests: " + testCount);
     console.log("Number of success: " + numOfSuccess);
