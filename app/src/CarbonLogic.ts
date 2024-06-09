@@ -209,27 +209,33 @@ export function deselectElementCell(dataGrid: string[][]): string[][] {
 
 export function makeBond(dataGrid: string[][], sourceX: number, sourceY: number, destinationX: number, destinationY: number, numOfBonds: number): string[][] {
     setGrid(dataGrid);
-    
-    const sourceCell = getElement(sourceX, sourceY);
+    if(sourceX < destinationX && sourceY < destinationY && Number(getCell(sourceX+1, sourceY+1)) !== 0) {
+        const bondReversedSignal = Number(getCell(sourceX+1, sourceY+1)) < 0 ? 1 : -1;
 
-    if(numOfBonds === 1){
-        setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds);
-    } else {
-        const sourceElementDescriptor = getElementDescriptorByAcronym(sourceCell);
-        const sourceElementBonds = getNumOfBonds(sourceX, sourceY);
-        if (sourceElementBonds >= sourceElementDescriptor.maxBonds) {
-            throw new Error('Not sufficient number of available bonds in elements.');
+        setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds * bondReversedSignal);
+    }
+    else {
+        const sourceCell = getElement(sourceX, sourceY);
+
+        if(numOfBonds === 1){
+            setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds);
+        } else {
+            const sourceElementDescriptor = getElementDescriptorByAcronym(sourceCell);
+            const sourceElementBonds = getNumOfBonds(sourceX, sourceY);
+            if (sourceElementBonds >= sourceElementDescriptor.maxBonds) {
+                throw new Error('Not sufficient number of available bonds in elements.');
+            }
+
+            const destinationCellCell = getElement(destinationX, destinationY);
+
+            const destinationElementDescriptor = getElementDescriptorByAcronym(destinationCellCell);
+            const destinationElementBonds = getNumOfBonds(destinationX, destinationY);
+            if (destinationElementBonds >= destinationElementDescriptor.maxBonds) {
+                throw new Error('Not sufficient number of available bonds in elements.');
+            }
+
+            setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds);
         }
-
-        const destinationCellCell = getElement(destinationX, destinationY);
-
-        const destinationElementDescriptor = getElementDescriptorByAcronym(destinationCellCell);
-        const destinationElementBonds = getNumOfBonds(destinationX, destinationY);
-        if (destinationElementBonds >= destinationElementDescriptor.maxBonds) {
-            throw new Error('Not sufficient number of available bonds in elements.');
-        }
-
-        setBond(sourceX, sourceY, destinationX, destinationY, numOfBonds);
     }
 
     return getTransposedGrid(grid);
