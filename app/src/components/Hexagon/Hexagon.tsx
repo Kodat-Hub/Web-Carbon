@@ -1,13 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
-import palette from 'src/styles/palette.module.scss'
+import palette from 'src/styles/Palette.module.scss'
 
 export default function Hexagon({
     width = '80px',
     borderWidth = '4px',
     backgroundColor = palette.background,
-    borderColor = palette.dark,
-    color = palette.dark,
+    borderColor = palette.light,
+    color = palette.light,
     text = 'C',
 } : {
     width?: string
@@ -27,6 +27,7 @@ export default function Hexagon({
         position: relative;
         margin: calc(${width} * 0.2887) 0;
         padding: 0;
+        pointer-events: none;
 
         &:before,
         &:after {
