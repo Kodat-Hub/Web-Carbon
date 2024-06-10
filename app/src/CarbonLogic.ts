@@ -279,6 +279,8 @@ export async function getCompoundName(dataGrid: string[][]): Promise<string> {
     
     const textualCompound = getTextualCompound();
 
+    console.log(textualCompound)
+
     const numOfExemplaries = 3;
 
     const exemplariesNamesPromises = Array.from({ length: numOfExemplaries }, 
@@ -472,15 +474,15 @@ function getTextualCompound(): string {
         const row = transposedGrid[i];
         let rowString = "";
         for (let j = 0; j < row.length; j++) {
-            if (transposedGrid[i][j] === "." || transposedGrid[i][j] === "*" || transposedGrid[i][j] === "0") {
+            const cell = transposedGrid[i][j];
+            if (cell === "." || cell === "*" || cell === "0") {
                 rowString += ".";
-            } else if (Number(transposedGrid[i][j]) < 0) {
-                transposedGrid[i][j] = (-Number(transposedGrid[i][j])).toString();
-            }
-            else if (transposedGrid[i][j] === " ") {
+            } else if (Number(cell) < 0) {
+                rowString += Math.abs(Number(cell)).toString();
+            } else if (cell === " ") {
                 rowString += "\t";
             } else {
-                rowString += transposedGrid[i][j];
+                rowString += cell;
             }
         }
         result.push(rowString);
