@@ -363,8 +363,6 @@ function getMoreOccurrenceName(exemplariesNames: string[]): string {
 
 function expandGrid(destinationX: number, destinationY: number): void {
     const newSize = getNewSizes(destinationX, destinationY);
-    const oldXGlobalOffset = xGlobalOffset;
-    const oldYGlobalOffset = yGlobalOffset;
 
     correctGlobalOffsets(destinationX, destinationY);
 
@@ -372,7 +370,7 @@ function expandGrid(destinationX: number, destinationY: number): void {
     if (!grid) throw new Error('Grid is undefined');
     for (let x = 0; x < grid.length; x++) {
         for (let y = 0; y < grid[0].length; y++) {
-            newGrid[x + xGlobalOffset - oldXGlobalOffset][y + yGlobalOffset - oldYGlobalOffset] = grid[x][y];
+            newGrid[x + xGlobalOffset][y + yGlobalOffset] = grid[x][y];
         }
     }
     
@@ -380,31 +378,29 @@ function expandGrid(destinationX: number, destinationY: number): void {
 }
 
 function correctGlobalOffsets(destinationX: number, destinationY: number): void {
-    const xNegativeOffset = (destinationX * 2) + xGlobalOffset - 2;
+    const xNegativeOffset = destinationX - 2;
     if (xNegativeOffset < 0) {
-        xGlobalOffset += Math.abs(xNegativeOffset);
+        xGlobalOffset = Math.abs(xNegativeOffset);
     }
 
-    const yNegativeOffset = (destinationY * 2) + yGlobalOffset - 2;
+    const yNegativeOffset = destinationY - 2;
     if (yNegativeOffset < 0) {
-        yGlobalOffset += Math.abs(yNegativeOffset);
+        yGlobalOffset = Math.abs(yNegativeOffset);
     }
 }
 
 function getNewSizes(destinationX: number, destinationY: number): { newWidth: number, newHeight: number } {
     if (!grid) throw new Error('Grid is undefined');
-    const adjustedDestinationX = (destinationX * 2) + xGlobalOffset;
-    const adjustedDestinationY = (destinationY * 2) + yGlobalOffset;
-
+    
     const newWidth =
-        (adjustedDestinationX - 2 < 0 ? 2 : 0) +
+        (destinationX - 2 < 0 ? 2 : 0) +
         grid.length +
-        (adjustedDestinationX + 2 > grid.length ? 2 : 0);
+        (destinationX + 2 > grid.length ? 2 : 0);
 
     const newHeight =
-        (adjustedDestinationY - 2 < 0 ? 2 : 0) +
+        (destinationY - 2 < 0 ? 2 : 0) +
         grid[0].length +
-        (adjustedDestinationY + 2 > grid[0].length ? 2 : 0);
+        (destinationY + 2 > grid[0].length ? 2 : 0);
 
     return {
         newWidth: newWidth,
