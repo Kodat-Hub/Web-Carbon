@@ -21,7 +21,6 @@ const CompoundName = styled.div`
 
     h1 {
         font-size: 32px;
-        text-transform: lowercase;
         text-align: center;
     }
 
@@ -68,7 +67,7 @@ export default function Grid () {
     return (
         <>
             <CompoundName>
-                <h1>{compoundName}</h1>
+                <h1>{compoundName.charAt(0).toUpperCase() + compoundName.slice(1)}</h1>
                 <button onClick={async () => setCompoundName(await getCompoundName(dataGridTransposed))}>NOMINATE</button>
             </CompoundName>
 
