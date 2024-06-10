@@ -4,7 +4,7 @@ import { GridComponent, GridCell, EmptyCell } from './GridStyledComponents';
 import Bond from '../Bond/Bond';
 import palette from 'src/styles/Palette.module.scss';
 
-import { addElementCell, removeElementCell, selectElementCell, deselectElementCell, makeBond, getCompoundName, getTransposedGrid, promptGrid } from './../../CarbonLogic.ts'
+import { deselectElementCell, getCompoundName, getTransposedGrid } from './../../CarbonLogic.ts'
 import styled from 'styled-components';
 
 const CompoundName = styled.div`

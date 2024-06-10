@@ -37,7 +37,7 @@ export default function Hexagon({
       ? addElementCell(transposedGrid, 'C', xIndex, yIndex)
       : selectElementCell(transposedGrid, xIndex, yIndex);
 
-    setDataGrid((prevGrid) => newGrid);
+    setDataGrid(() => newGrid);
   };
 
   return (
