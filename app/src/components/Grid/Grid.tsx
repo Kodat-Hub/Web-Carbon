@@ -42,16 +42,16 @@ const CompoundContainer = styled.div`
     display: flex;
 
     width: calc(100vw - 48px);
-    min-height: 80vh;
+    min-height: 100vh;
     height: fit-content;
 
     position: absolute;
     left: 0;
-    top: 20vh;
+    top: 0vh;
 
     justify-content: center;
     align-items: center;
-    overflow: scroll;
+    /*overflow: scroll;*/
 `
 
 export default function Grid () {
@@ -66,10 +66,10 @@ export default function Grid () {
 
     return (
         <>
-            <CompoundName>
+            {/*<CompoundName>
                 <h1>{compoundName.charAt(0).toUpperCase() + compoundName.slice(1)}</h1>
                 <button onClick={async () => setCompoundName(await getCompoundName(dataGridTransposed))}>NOMINATE</button>
-            </CompoundName>
+            </CompoundName>*/}
 
             <CompoundContainer>
                 <GridComponent length={dataGrid[0].length}>

@@ -23,7 +23,7 @@ export const GridComponent = styled.div<GridProps>`
     grid-template-columns: repeat(${props => props.length}, auto);
     width: fit-content;
     height: fit-content;
-    overflow: scroll;
+    /*overflow: scroll;*/
 
     ${EmptyCell} { transform: translateX(0); }
 

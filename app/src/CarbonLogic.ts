@@ -8,7 +8,7 @@ const ELEMENTS = [
 ];
 
 const temperature = 0;
-const model = "ft:gpt-3.5-turbo-0125:personal:validated:9Xv0YPoI";
+const model = undefined;
 const persona = 
     `You must respond the name of hydrocarbon using the user grid.
 
