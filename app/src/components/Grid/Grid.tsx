@@ -4,39 +4,8 @@ import { GridComponent, GridCell, EmptyCell } from './GridStyledComponents';
 import Bond from '../Bond/Bond';
 import palette from 'src/styles/Palette.module.scss';
 
-import { deselectElementCell, getCompoundName, getTransposedGrid } from './../../CarbonLogic.ts'
+import { deselectElementCell, getTransposedGrid } from './../../CarbonLogic.ts'
 import styled from 'styled-components';
-
-const CompoundName = styled.div`
-    width: 100vw;
-    height: 15vh;
-
-    display: flex;
-    flex-direction: column;
-
-    align-content: center;
-    
-    position: relative;
-    top: 16px;
-
-    h1 {
-        font-size: 32px;
-        text-align: center;
-    }
-
-    button {
-        background-color: ${palette.light};
-        border: 2px solid ${palette.secondary};
-        color: ${palette.dark};
-        border-radius: 5px;
-        padding: 5px 8px;
-        margin: 0 auto;
-
-        &:hover {
-            cursor: pointer;
-        }
-    }
-`
 
 const CompoundContainer = styled.div`
     display: flex;
@@ -56,7 +25,6 @@ const CompoundContainer = styled.div`
 
 export default function Grid () {
 
-    const [ compoundName, setCompoundName ] = useState('create your element');
     const [ dataGrid, setDataGrid ] = useState([[ '*' ]]);
     const [ dataGridTransposed, setDataGridTransposed ] = useState([[ '*' ]]);
 
@@ -66,10 +34,6 @@ export default function Grid () {
 
     return (
         <>
-            {/*<CompoundName>
-                <h1>{compoundName.charAt(0).toUpperCase() + compoundName.slice(1)}</h1>
-                <button onClick={async () => setCompoundName(await getCompoundName(dataGridTransposed))}>NOMINATE</button>
-            </CompoundName>*/}
 
             <CompoundContainer>
                 <GridComponent length={dataGrid[0].length}>
