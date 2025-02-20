@@ -318,7 +318,7 @@ function setGrid(dataGrid: string[][]): void {
 function getCompoundNameWithRequest(textualCompound: string): Promise<Response> {
     // General API
     const baseURL = "https://api.openai.com/v1/";
-    const token  = "";
+    const token  = "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";
     
     // chat/completions
     const endPoint = "chat/completions";
