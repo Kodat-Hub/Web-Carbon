@@ -8,7 +8,7 @@ const ELEMENTS = [
 ];
 
 const temperature = 0;
-const model = undefined;
+const model = "ft:gpt-3.5-turbo-0125:personal:validated:9Xv0YPoI";
 const persona = 
     `You must respond the name of hydrocarbon using the user grid.
 
@@ -318,7 +318,7 @@ function setGrid(dataGrid: string[][]): void {
 function getCompoundNameWithRequest(textualCompound: string): Promise<Response> {
     // General API
     const baseURL = "https://api.openai.com/v1/";
-    const token = "sk-web-carbon-ai-iPKneRKc5xpT2N0fpg5qT3BlbkFJrgQIu32NdXeZQxUV2yui";
+    const token  = "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";
     
     // chat/completions
     const endPoint = "chat/completions";
